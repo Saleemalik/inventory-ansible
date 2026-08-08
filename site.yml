@@ -1,15 +1,7 @@
 ---
-- name: Test Ansible Automation
+- name: Deploy Inventory System
   hosts: all
   become: true
 
-  tasks:
-
-    - name: Display server hostname
-      ansible.builtin.command:
-        cmd: hostname
-      register: hostname_result
-
-    - name: Display hostname
-      ansible.builtin.debug:
-        msg: "Managed server: {{ hostname_result.stdout }}"
+  roles:
+    - common

@@ -1,0 +1,16 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/common
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install common system packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
