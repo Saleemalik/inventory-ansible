@@ -1,5 +1,11 @@
+# .gitignore
 venv/
 __pycache__/
 *.pyc
 inventory
 ansible.cfg
+venv/
+.vscode/
+*.pyc
+*.retry
+.vault-password
