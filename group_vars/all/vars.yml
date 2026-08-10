@@ -3,6 +3,19 @@ app_name: inventory-system
 app_user: inventory
 app_directory: /opt/inventory-system
 
+deploy_user: maliks
+
+app_repo: "git@github.com:Saleemalik/inventory_system.git"
+app_branch: main
+
+venv_directory: /opt/inventory-system/venv
+
+github_ssh_directory: "/home/{{ deploy_user }}/.ssh"
+github_deploy_key: "{{ github_ssh_directory }}/github_deploy"
+github_deploy_public_key: "{{ github_ssh_directory }}/github_deploy.pub"
+github_known_hosts: "{{ github_ssh_directory }}/known_hosts"
+github_ssh_config: "{{ github_ssh_directory }}/config"
+
 postgresql_db: inventory_db
 postgresql_user: inventory_user
 postgresql_password: "{{ vault_postgresql_password }}"

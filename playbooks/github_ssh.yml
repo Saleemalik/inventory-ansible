@@ -1,0 +1,106 @@
+---
+- name: Configure GitHub SSH authentication
+  hosts: all
+  become: true
+
+  tasks:
+
+    - name: Check GitHub SSH authentication
+      become_user: "{{ deploy_user }}"
+      ansible.builtin.command:
+        cmd: >-
+          ssh
+          -i /home/{{ deploy_user }}/.ssh/github_deploy
+          -o IdentitiesOnly=yes
+          -o BatchMode=yes
+          -T git@github.com
+      register: github_ssh_test
+      changed_when: false
+      failed_when: false
+
+    - name: Show GitHub SSH test result
+      ansible.builtin.debug:
+        msg:
+          - "SSH return code: {{ github_ssh_test.rc }}"
+          - "SSH stdout: {{ github_ssh_test.stdout | default('') }}"
+          - "SSH stderr: {{ github_ssh_test.stderr | default('') }}"
+
+    - name: Set GitHub authentication status
+      ansible.builtin.set_fact:
+        github_ssh_authenticated: >-
+          {{
+            'successfully authenticated' in
+            (github_ssh_test.stderr | default('') | lower)
+          }}
+
+    - name: Report successful GitHub SSH authentication
+      ansible.builtin.debug:
+        msg: >-
+          GitHub SSH authentication is already configured successfully
+          for {{ deploy_user }}.
+      when: github_ssh_authenticated
+
+    - name: Ensure deployment user SSH directory exists
+      ansible.builtin.file:
+        path: "/home/{{ deploy_user }}/.ssh"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0700"
+      when: not github_ssh_authenticated
+
+    - name: Generate GitHub deployment SSH key
+      community.crypto.openssh_keypair:
+        path: "/home/{{ deploy_user }}/.ssh/github_deploy"
+        type: ed25519
+        comment: "{{ app_name }} deployment key"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0600"
+        force: false
+      when: not github_ssh_authenticated
+
+    - name: Configure GitHub known_hosts
+      ansible.builtin.known_hosts:
+        path: "/home/{{ deploy_user }}/.ssh/known_hosts"
+        name: github.com
+        key: "{{ lookup('pipe', 'ssh-keyscan -t ed25519 github.com 2>/dev/null') }}"
+        state: present
+      when: not github_ssh_authenticated
+
+    - name: Set GitHub known_hosts ownership and permissions
+      ansible.builtin.file:
+        path: "/home/{{ deploy_user }}/.ssh/known_hosts"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0644"
+      when: not github_ssh_authenticated
+
+    - name: Configure SSH for GitHub
+      ansible.builtin.copy:
+        dest: "/home/{{ deploy_user }}/.ssh/config"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0600"
+        content: |
+          Host github.com
+              HostName github.com
+              User git
+              IdentityFile /home/{{ deploy_user }}/.ssh/github_deploy
+              IdentitiesOnly yes
+      when: not github_ssh_authenticated
+
+    - name: Display GitHub deployment public key
+      ansible.builtin.command:
+        cmd: cat "/home/{{ deploy_user }}/.ssh/github_deploy.pub"
+      register: github_public_key
+      changed_when: false
+      when: not github_ssh_authenticated
+
+    - name: Show GitHub deployment public key
+      ansible.builtin.debug:
+        msg:
+          - "GitHub SSH authentication is not configured yet."
+          - "Add this public key to GitHub Repository -> Settings -> Deploy keys:"
+          - "{{ github_public_key.stdout }}"
+      when: not github_ssh_authenticated

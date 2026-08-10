@@ -1,0 +1,44 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/backend
+- name: Install Git
+  ansible.builtin.apt:
+    name: git
+    state: present
+
+- name: Ensure application user exists
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    home: "{{ app_directory }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Ensure application directory exists
+  ansible.builtin.file:
+    path: "{{ app_directory }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
+- name: Clone or update Inventory System repository
+  become_user: "{{ app_user }}"
+  ansible.builtin.git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_directory }}"
+    version: "{{ app_branch }}"
+    update: true
+
+- name: Create Python virtual environment
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: python3 -m venv "{{ venv_directory }}"
+    creates: "{{ venv_directory }}/bin/python"
+
+- name: Install Python dependencies
+  become_user: "{{ app_user }}"
+  ansible.builtin.pip:
+    requirements: "{{ app_directory }}/requirements.txt"
+    virtualenv: "{{ venv_directory }}"
