@@ -1,14 +1,16 @@
 ---
 app_name: inventory-system
-app_user: inventory
-app_directory: /opt/inventory-system
+app_user: inventory2
+app_group: inventory2
 
 deploy_user: maliks
 
+app_user_home: /home/inventory2
+app_directory: /opt/inventory-system-2
+venv_directory: /opt/inventory-system-2/venv
+
 app_repo: "git@github.com:Saleemalik/inventory_system.git"
 app_branch: main
-
-venv_directory: /opt/inventory-system/venv
 
 github_ssh_directory: "/home/{{ deploy_user }}/.ssh"
 github_deploy_key: "{{ github_ssh_directory }}/github_deploy"
