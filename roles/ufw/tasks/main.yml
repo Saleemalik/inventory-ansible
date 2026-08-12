@@ -1,0 +1,47 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/ufw
+
+- name: Install UFW
+  become: true
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: true
+
+- name: Set UFW default incoming policy
+  become: true
+  community.general.ufw:
+    direction: incoming
+    policy: "{{ ufw_default_incoming_policy }}"
+
+- name: Set UFW default outgoing policy
+  become: true
+  community.general.ufw:
+    direction: outgoing
+    policy: "{{ ufw_default_outgoing_policy }}"
+
+- name: Allow SSH
+  become: true
+  community.general.ufw:
+    rule: allow
+    name: "{{ ufw_ssh_rule }}"
+
+- name: Allow Nginx HTTP and HTTPS
+  become: true
+  community.general.ufw:
+    rule: allow
+    name: "{{ ufw_nginx_rule }}"
+
+- name: Ensure Gunicorn port 8000 is not exposed
+  become: true
+  community.general.ufw:
+    rule: deny
+    port: "{{ ufw_temporary_gunicorn_port }}"
+    proto: tcp
+  when: ufw_remove_temporary_gunicorn_port
+
+- name: Enable UFW
+  become: true
+  community.general.ufw:
+    state: enabled

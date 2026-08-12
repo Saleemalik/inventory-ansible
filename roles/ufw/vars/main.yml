@@ -1,0 +1,12 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/ufw
+
+ufw_default_incoming_policy: deny
+ufw_default_outgoing_policy: allow
+
+ufw_ssh_rule: OpenSSH
+ufw_nginx_rule: Nginx Full
+
+ufw_remove_temporary_gunicorn_port: true
+ufw_temporary_gunicorn_port: "8000"

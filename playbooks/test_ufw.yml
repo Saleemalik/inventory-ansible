@@ -1,0 +1,7 @@
+---
+- name: Test UFW Role
+  hosts: inventory_servers
+  become: true
+
+  roles:
+    - ufw
