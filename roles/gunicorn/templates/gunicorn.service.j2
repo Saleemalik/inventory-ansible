@@ -1,0 +1,20 @@
+[Unit]
+Description=Gunicorn daemon for {{ app_name }}
+After=network.target
+
+[Service]
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_directory }}
+Environment="PATH={{ venv_directory }}/bin"
+
+ExecStart={{ venv_directory }}/bin/gunicorn \
+    --workers {{ gunicorn_workers }} \
+    --bind {{ gunicorn_bind }} \
+    {{ gunicorn_wsgi_module }}
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

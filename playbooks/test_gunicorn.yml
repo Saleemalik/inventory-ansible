@@ -1,0 +1,7 @@
+---
+- name: Test Gunicorn Role
+  hosts: inventory_servers
+  become: true
+
+  roles:
+    - gunicorn

@@ -1,0 +1,14 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for roles/gunicorn
+
+- name: Reload systemd
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart Gunicorn
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ gunicorn_service_name }}"
+    state: restarted

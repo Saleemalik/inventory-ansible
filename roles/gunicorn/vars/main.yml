@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/gunicorn
+
+gunicorn_service_name: gunicorn
+gunicorn_workers: 3
+gunicorn_socket: "{{ app_directory }}/gunicorn.sock"
+gunicorn_bind: "unix:{{ gunicorn_socket }}"
+gunicorn_wsgi_module: inventory_system.wsgi:application
