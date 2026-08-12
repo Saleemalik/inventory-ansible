@@ -29,7 +29,7 @@
     group: "{{ app_group }}"
     mode: "0755"
 
-- name: Clone or update Inventory System repository
+- name: Clone or update Git repository
   become_user: "{{ deploy_user }}"
   ansible.builtin.git:
     repo: "{{ app_repo }}"
