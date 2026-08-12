@@ -9,6 +9,9 @@ app_user_home: /home/inventory2
 app_directory: /opt/inventory-system-2
 venv_directory: /opt/inventory-system-2/venv
 
+static_root: "{{ app_directory }}/staticfiles"
+media_root: "{{ app_directory }}/media"
+
 app_repo: "git@github.com:Saleemalik/inventory_system.git"
 app_branch: main
 

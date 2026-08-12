@@ -23,7 +23,7 @@
 - name: Ensure Django static files directory exists
   become: true
   ansible.builtin.file:
-    path: "{{ app_directory }}/staticfiles"
+    path: "{{ static_root }}"
     state: directory
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
@@ -32,7 +32,7 @@
 - name: Ensure Django media directory exists
   become: true
   ansible.builtin.file:
-    path: "{{ django_media_root }}"
+    path: "{{ media_root }}"
     state: directory
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
