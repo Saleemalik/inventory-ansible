@@ -1,0 +1,25 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/logrotate
+
+- name: Install logrotate
+  become: true
+  ansible.builtin.apt:
+    name: logrotate
+    state: present
+    update_cache: true
+
+- name: Configure application logrotate
+  become: true
+  ansible.builtin.template:
+    src: inventory-system.j2
+    dest: "{{ logrotate_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Validate logrotate configuration
+  become: true
+  ansible.builtin.command:
+    cmd: logrotate -d "{{ logrotate_config_file }}"
+  changed_when: false

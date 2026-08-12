@@ -1,0 +1,7 @@
+---
+- name: Test Logrotate Role
+  hosts: inventory_servers
+  become: true
+
+  roles:
+    - logrotate

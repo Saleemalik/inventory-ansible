@@ -12,3 +12,4 @@
     - gunicorn
     - nginx
     - ufw
+    - logrotate

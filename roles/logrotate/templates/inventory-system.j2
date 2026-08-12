@@ -1,0 +1,10 @@
+{{ logrotate_log_pattern }} {
+    {{ logrotate_frequency }}
+    rotate {{ logrotate_rotate_count }}
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    su {{ logrotate_user }} {{ logrotate_group }}
+}

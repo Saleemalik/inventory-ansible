@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/logrotate
+
+logrotate_config_name: inventory-system
+
+logrotate_config_file: "/etc/logrotate.d/{{ logrotate_config_name }}"
+
+logrotate_log_directory: "{{ app_directory }}/logs"
+
+logrotate_log_pattern: "{{ logrotate_log_directory }}/*.log"
+
+logrotate_frequency: daily
+
+logrotate_rotate_count: 7
+
+logrotate_user: "{{ app_user }}"
+logrotate_group: "{{ app_group }}"
