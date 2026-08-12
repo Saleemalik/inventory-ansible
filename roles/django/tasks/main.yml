@@ -1,0 +1,58 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/django
+
+- name: Configure Django environment file
+  become: true
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ django_env_file }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ app_group }}"
+    mode: "0640"
+
+- name: Ensure Django logs directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ app_directory }}/logs"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
+- name: Ensure Django static files directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ app_directory }}/staticfiles"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
+- name: Run Django system checks
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: "{{ django_python }} {{ django_manage_py }} check"
+    chdir: "{{ app_directory }}"
+  environment:
+    DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
+  changed_when: false
+
+- name: Run Django database migrations
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: "{{ django_python }} {{ django_manage_py }} migrate --noinput"
+    chdir: "{{ app_directory }}"
+  environment:
+    DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
+
+- name: Collect Django static files
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: "{{ django_python }} {{ django_manage_py }} collectstatic --noinput"
+    chdir: "{{ app_directory }}"
+  environment:
+    DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
