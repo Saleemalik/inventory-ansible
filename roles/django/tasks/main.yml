@@ -29,6 +29,15 @@
     group: "{{ app_group }}"
     mode: "0755"
 
+- name: Ensure Django media directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ django_media_root }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
 - name: Run Django system checks
   become: true
   become_user: "{{ app_user }}"

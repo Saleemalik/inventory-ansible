@@ -6,3 +6,6 @@ django_manage_py: "{{ app_directory }}/manage.py"
 django_python: "{{ venv_directory }}/bin/python"
 django_env_file: "{{ app_directory }}/.env"
 django_settings_module: inventory_system.settings
+
+django_static_root: "{{ app_directory }}/staticfiles"
+django_media_root: "{{ app_directory }}/media"
