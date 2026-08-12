@@ -1,0 +1,7 @@
+---
+- name: Test Nginx Role
+  hosts: inventory_servers
+  become: true
+
+  roles:
+    - nginx

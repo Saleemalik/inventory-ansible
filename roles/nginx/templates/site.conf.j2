@@ -1,0 +1,31 @@
+server {
+    listen {{ nginx_listen_port }};
+    server_name {{ nginx_server_name }};
+
+    client_max_body_size {{ nginx_client_max_body_size }};
+
+    root {{ nginx_frontend_root }};
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        include proxy_params;
+        proxy_pass http://unix:{{ nginx_gunicorn_socket }}:;
+    }
+
+    location /admin/ {
+        include proxy_params;
+        proxy_pass http://unix:{{ nginx_gunicorn_socket }}:;
+    }
+
+    location /static/ {
+        alias {{ static_root }}/;
+    }
+
+    location /media/ {
+        alias {{ media_root }}/;
+    }
+}

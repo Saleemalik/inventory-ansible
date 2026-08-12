@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/nginx
+
+nginx_service_name: nginx
+
+nginx_server_name: "_"
+
+nginx_listen_port: 80
+
+nginx_client_max_body_size: "50M"
+
+nginx_site_name: inventory-system
+
+nginx_site_config: "/etc/nginx/sites-available/{{ nginx_site_name }}"
+nginx_site_enabled: "/etc/nginx/sites-enabled/{{ nginx_site_name }}"
+
+nginx_frontend_root: "{{ app_directory }}/frontend/dist"
+
+nginx_gunicorn_socket: "{{ app_directory }}/gunicorn.sock"

@@ -1,0 +1,48 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/nginx
+
+- name: Install Nginx
+  become: true
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+
+- name: Install Nginx site configuration
+  become: true
+  ansible.builtin.template:
+    src: site.conf.j2
+    dest: "{{ nginx_site_config }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Test Nginx configuration
+    - Reload Nginx
+
+- name: Enable {{ nginx_site_name }} Nginx site
+  become: true
+  ansible.builtin.file:
+    src: "{{ nginx_site_config }}"
+    dest: "{{ nginx_site_enabled }}"
+    state: link
+  notify:
+    - Test Nginx configuration
+    - Reload Nginx
+
+- name: Remove default Nginx site
+  become: true
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - Test Nginx configuration
+    - Reload Nginx
+
+- name: Enable and start Nginx
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ nginx_service_name }}"
+    enabled: true
+    state: started
