@@ -1,0 +1,113 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/frontend
+
+- name: Install frontend prerequisites
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - ca-certificates
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Download NodeSource setup script
+  become: true
+  ansible.builtin.get_url:
+    url: "https://deb.nodesource.com/setup_{{ nodejs_major_version }}.x"
+    dest: "/tmp/nodesource_setup.sh"
+    mode: "0755"
+
+- name: Configure NodeSource repository
+  become: true
+  ansible.builtin.command:
+    cmd: "/tmp/nodesource_setup.sh"
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js
+  become: true
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+
+- name: Verify Node.js installation
+  ansible.builtin.command:
+    cmd: node --version
+  register: node_version
+  changed_when: false
+
+- name: Display Node.js version
+  ansible.builtin.debug:
+    msg: "Node.js version: {{ node_version.stdout }}"
+
+- name: Verify npm installation
+  ansible.builtin.command:
+    cmd: npm --version
+  register: npm_version
+  changed_when: false
+
+- name: Display npm version
+  ansible.builtin.debug:
+    msg: "npm version: {{ npm_version.stdout }}"
+
+- name: Configure frontend environment
+  become: true
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ frontend_env_file }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ app_group }}"
+    mode: "0640"
+
+- name: Ensure frontend node_modules directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ frontend_directory }}/node_modules"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
+- name: Ensure frontend build directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ frontend_build_directory }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
+- name: Install frontend dependencies
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: npm ci
+    chdir: "{{ frontend_directory }}"
+  environment:
+    HOME: "{{ app_user_home }}"
+
+- name: Build frontend
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: npm run build
+    chdir: "{{ frontend_directory }}"
+  environment:
+    HOME: "{{ app_user_home }}"
+
+- name: Verify frontend build directory
+  become: true
+  ansible.builtin.stat:
+    path: "{{ frontend_build_directory }}"
+  register: frontend_build
+
+- name: Verify frontend build was created
+  ansible.builtin.assert:
+    that:
+      - frontend_build.stat.exists
+      - frontend_build.stat.isdir
+    fail_msg: "Frontend build directory was not created: {{ frontend_build_directory }}"
+    success_msg: "Frontend build directory exists: {{ frontend_build_directory }}"

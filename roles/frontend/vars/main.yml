@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/frontend
+
+frontend_directory: "{{ app_directory }}/frontend"
+frontend_env_file: "{{ app_directory }}/frontend/.env"
+frontend_build_directory: "{{ app_directory }}/frontend/dist"
+
+nodejs_major_version: "22"
+frontend_api_base: "/api"

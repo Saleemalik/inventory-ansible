@@ -1,0 +1,8 @@
+---
+- name: Test Frontend Role
+  hosts: inventory_servers
+  become: true
+
+  roles:
+    - frontend
+
