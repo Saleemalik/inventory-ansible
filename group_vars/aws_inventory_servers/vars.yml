@@ -1,0 +1,14 @@
+---
+# AWS-specific deployment settings
+
+deploy_user: ubuntu
+
+app_user: inventory2
+app_group: inventory2
+
+app_user_home: /home/inventory2
+
+django_allowed_hosts:
+  - localhost
+  - 127.0.0.1
+  - 15.252.183.242

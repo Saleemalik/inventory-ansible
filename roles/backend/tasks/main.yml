@@ -50,8 +50,18 @@
     recurse: true
 
 - name: Ensure application Ansible directory exists
+  become: true
   ansible.builtin.file:
     path: "/home/{{ app_user }}/.ansible"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0700"
+
+- name: Ensure application Ansible temporary directory exists
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ app_user }}/.ansible/tmp"
     state: directory
     owner: "{{ app_user }}"
     group: "{{ app_group }}"

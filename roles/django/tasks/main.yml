@@ -57,6 +57,39 @@
   environment:
     DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
 
+- name: Check whether Django superuser exists
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    argv:
+      - "{{ django_python }}"
+      - "{{ django_manage_py }}"
+      - shell
+      - -c
+      - "from django.contrib.auth import get_user_model; print(get_user_model().objects.filter(username='{{ django_superuser_username }}').exists())"
+  register: django_superuser_exists
+  changed_when: false
+
+- name: Determine whether Django superuser exists
+  ansible.builtin.set_fact:
+    django_superuser_found: "{{ django_superuser_exists.stdout_lines | last | trim | bool }}"
+
+- name: Create Django superuser
+  become: true
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: >
+      {{ django_python }} {{ django_manage_py }}
+      createsuperuser
+      --username={{ django_superuser_username }}
+      --email={{ django_superuser_email }}
+      --noinput
+  environment:
+    DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
+    DJANGO_SUPERUSER_PASSWORD: "{{ django_superuser_password }}"
+  when: not django_superuser_found
+  no_log: true
+
 - name: Collect Django static files
   become: true
   become_user: "{{ app_user }}"

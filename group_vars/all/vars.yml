@@ -28,7 +28,11 @@ postgresql_host: localhost
 postgresql_port: 5432
 
 django_secret_key: "{{ vault_django_secret_key }}"
+django_debug: "False"
 
+django_superuser_username: admin2
+django_superuser_email: admin@example.com
+django_superuser_password: "{{ vault_django_superuser_password }}"
 django_allowed_hosts:
   - localhost
   - 127.0.0.1

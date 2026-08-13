@@ -14,4 +14,5 @@
       - python3-pip
       - python3-venv
       - acl
+      - build-essential
     state: present

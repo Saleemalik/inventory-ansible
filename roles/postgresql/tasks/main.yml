@@ -6,6 +6,7 @@
     name:
       - postgresql
       - postgresql-contrib
+      - libpq-dev
       - python3-psycopg2
     state: present
 
