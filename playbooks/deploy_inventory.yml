@@ -3,6 +3,13 @@
   hosts: all
   become: true
 
+  pre_tasks:
+    - name: Initialize deployment flags
+      ansible.builtin.set_fact:
+        gunicorn_restart_required: false
+        nginx_reload_required: false
+        systemd_reload_required: false
+  
   roles:
     - common
     - postgresql
@@ -13,3 +20,31 @@
     - nginx
     - ufw
     - logrotate
+
+  post_tasks:
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when: systemd_reload_required
+
+    - name: Restart Gunicorn
+      ansible.builtin.systemd:
+        name: gunicorn
+        state: restarted
+      when: gunicorn_restart_required
+
+    - name: Validate Nginx configuration
+      ansible.builtin.command:
+        cmd: nginx -t
+      register: nginx_validation
+      changed_when: false
+      when: nginx_reload_required
+
+    - name: Reload Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+      when:
+        - nginx_reload_required
+        - nginx_validation.rc == 0

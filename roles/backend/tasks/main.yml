@@ -36,7 +36,14 @@
     dest: "{{ app_directory }}"
     version: "{{ app_branch }}"
     update: true
+  register: git_result
 
+- name: Mark Services restart as required
+  ansible.builtin.set_fact:
+    gunicorn_restart_required: true
+    systemd_reload_required: true
+  when: git_result.changed
+  
 - name: Create Python virtual environment
   ansible.builtin.command:
     cmd: python3 -m venv "{{ venv_directory }}"

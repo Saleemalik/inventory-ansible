@@ -10,6 +10,13 @@
     owner: "{{ deploy_user }}"
     group: "{{ app_group }}"
     mode: "0640"
+  register: django_env_result
+
+- name: Mark Services restart as required
+  ansible.builtin.set_fact:
+    gunicorn_restart_required: true
+    systemd_reload_required: true
+  when: django_env_result.changed
 
 - name: Ensure Django logs directory exists
   become: true
