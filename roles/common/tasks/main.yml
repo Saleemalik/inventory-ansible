@@ -15,4 +15,6 @@
       - python3-venv
       - acl
       - build-essential
+      - "{{ python_dev_package }}"
+      - libpq-dev
     state: present

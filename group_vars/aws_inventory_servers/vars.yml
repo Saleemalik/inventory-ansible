@@ -11,4 +11,8 @@ app_user_home: /home/inventory2
 django_allowed_hosts:
   - localhost
   - 127.0.0.1
-  - 15.252.183.242
+  - 35.154.90.106
+
+python_version: "3.14"
+python_executable: /usr/bin/python3.14
+python_dev_package: python3.14-dev
