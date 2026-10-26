@@ -34,7 +34,7 @@
   ansible.builtin.git:
     repo: "{{ app_repo }}"
     dest: "{{ app_directory }}"
-    version: "{{ app_branch }}"
+    version: "{{ app_commit | default(app_branch) }}"
     update: true
   register: git_result
 
